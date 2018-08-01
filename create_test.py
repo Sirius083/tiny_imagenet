@@ -53,4 +53,18 @@ for d in dirnames:
         os.rename(file_new_path , file_new_rename)
         count += 1
         test_label['test_' + str(count)] = clsname
+         
+         
+# save test_label to file
+import pickle
+
+obj = test_label
+name = 'test_label' 
+
+def save_obj(obj,name):
+    with open(name + '.pkl', 'wb') as f:
+        pickle.dump(obj, f, pickle.HIGHEST_PROTOCOL)
+
+save_obj(obj,name)       
+
         

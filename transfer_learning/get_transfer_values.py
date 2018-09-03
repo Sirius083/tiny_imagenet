@@ -194,3 +194,31 @@ with tf.Session() as sess:
     batch_transfer_values = sess.run(tv, feed_dict = {"DecodeJpeg":tiny_train_0})
     print('batch_transfer_values',batch_transfer_values)
 '''
+
+
+#==============================================================================
+# 将不同 pickle 文件合并成一个，接下来要分batch进行训练
+pickle_path = 'E:\\transfer_tiny_imagenet\\data'
+pickle_list =  ['tiny_train_1.pkl',
+                'tiny_train_2.pkl',
+                'tiny_train_3.pkl',
+                'tiny_train_4.pkl',
+                'tiny_train_5.pkl',
+                'tiny_train_6.pkl',
+                'tiny_train_7.pkl',
+                'tiny_train_8.pkl',
+                'tiny_train_9.pkl']
+
+import pickle
+with open('E:\\transfer_tiny_imagenet\\data\\tiny_train_0.pkl', 'rb') as handle:
+     alldata = pickle.load(handle)
+     
+for p_ in pickle_list:
+    with open('E:\\transfer_tiny_imagenet\\data\\' + p_, 'rb') as handle:
+         data = pickle.load(handle)
+         alldata = np.concatenate((alldata,data),axis = 0) # (100000,2048)
+         
+# 存储全部训练集对应的transfer values
+with open('tiny_train_all.pickle', 'wb') as handle:
+    pickle.dump(alldata, handle)
+

@@ -9,6 +9,7 @@ jpeg --> np.array --> pickle
 Q: 无法训练??
 images 和 label一定要对应起来
 将输入图片大小在预处理阶段-->299X299
+每个batch : 10000张图片无法处理，改成5000张可以处理
 """
 
 import matplotlib.pyplot as plt
@@ -92,18 +93,19 @@ with tf.Session() as sess:
     sess.run(init)
     stime = time.time()
     # Note1: 第一次训练没有结果，images和labels需要对应
-    for i in range(10):
+    for i in range(20):
         train_tmp,labels_tmp = sess.run([images,labels], feed_dict = {handle: train_iterator_handle}) 
         # test_decode = sess.run(images, feed_dict = {handle: val_iterator_handle})
         transfer_values_train = process_images(images = train_tmp, model=model)
         print('========== process %d done'%i)
-        del train_tmp
+        # del train_tmp
         # save transfer value directly
-        with open('E:\\transfer_tiny_imagenet\\data2\\train_data_' + str(i) + '.pkl', 'wb') as file:
+    
+        with open('E:\\transfer_tiny_imagenet\\data2\\train_data_'+str(i)+'.pkl', 'wb') as file:
              pickle.dump(transfer_values_train, file)
         with open('E:\\transfer_tiny_imagenet\\data2\\train_labels_' + str(i) + '.pkl', 'wb') as file:
              pickle.dump(labels_tmp, file)
-        del labels_tmp,transfer_values_train
+        del train_tmp, labels_tmp,transfer_values_train
         
     etime = time.time()
 print('total time', (etime-stime)/60) # 将训练集全部转化为np.array并保存 一共用时1分钟

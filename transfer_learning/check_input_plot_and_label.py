@@ -71,7 +71,6 @@ def plot_images(images, cls_true, cls_pred=None, smooth=True):
     # in a single Notebook cell.
     plt.show()
     
-
 #=============================================== tiny imagenet
 # 准备数据
 train_data_path = r'E:\transfer_tiny_imagenet\data_new\train_data_5.pkl'
@@ -95,3 +94,65 @@ label_dict, class_description = build_label_dicts()
 
 # plot_images(images=images, cls_true=label_list, smooth=False) 
 plot_images(images=images, cls_true=cls_true, smooth=False) 
+
+
+#==============================================================================
+inception.maybe_download()
+model = inception.Inception()
+from inception import transfer_values_cache
+
+file_path_cache_train = os.path.join(os.getcwd(), 'inception_tiny_train.pkl')
+file_path_cache_test = os.path.join(os.getcwd(), 'inception_tiny_test.pkl')
+
+
+images = train_data[3000:6000,:,:,:]
+cls_true = train_label[3000:6000]
+transfer_values_train = transfer_values_cache(cache_path=file_path_cache_train,
+                                              images=images,
+                                              model=model)
+
+def plot_scatter(values, cls):
+    # Create a color-map with a different color for each class.
+    import matplotlib.cm as cm
+    cmap = cm.rainbow(np.linspace(0.0, 1.0, num_classes))
+
+    # Get the color for each sample.
+    colors = cmap[cls]
+
+    # Extract the x- and y-values.
+    x = values[:, 0]
+    y = values[:, 1]
+
+    # Plot it.
+    plt.scatter(x, y, color=colors)
+    plt.show()
+
+# TSNE is very slow, first use PCA to reduce dimension
+# transfer values after tSNE dimensionality reduction
+from sklearn.manifold import TSNE
+from sklearn.decomposition import PCA
+
+pca = PCA(n_components=50)
+transfer_values_50d = pca.fit_transform(transfer_values_train)
+
+tsne = TSNE(n_components=2)
+transfer_values_reduced = tsne.fit_transform(transfer_values_50d) # (3000,2) 
+
+num_classes = 200
+plot_scatter(transfer_values_reduced, cls_true)
+
+# transfer value 就没有把不同的类别分开
+#  {24, 83, 91, 108, 163, 193}
+idx = [i for (i,t) in enumerate(cls_true) if t == 91]
+transfer_tmp = transfer_values_train[idx,:]
+cls = cls_true[idx]
+
+pca = PCA(n_components=50)
+transfer_values_50d = pca.fit_transform(transfer_tmp)
+tsne = TSNE(n_components=2)
+transfer_values_2d = tsne.fit_transform(transfer_values_50d) # (3000,2) 
+
+num_classes = 200
+plot_scatter(transfer_values_2d, cls)
+
+

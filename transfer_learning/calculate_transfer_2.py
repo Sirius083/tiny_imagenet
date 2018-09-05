@@ -9,7 +9,6 @@ jpeg --> np.array --> pickle
 Q: 无法训练??
 images 和 label一定要对应起来
 将输入图片大小在预处理阶段-->299X299
-每个batch : 10000张图片无法处理，改成5000张可以处理
 """
 
 import matplotlib.pyplot as plt
@@ -33,9 +32,9 @@ def process_images(images,model):
         msg = "\r- Processing image: {0:>6} / {1}".format(i+1, num_images)
         sys.stdout.write(msg)
         sys.stdout.flush()
-
-    result[i] = model.transfer_values(image=images[i])
+        result[i] = model.transfer_values(image=images[i])
     print()
+    print(result[i].shape)
     result = np.array(result)
     return result
 
@@ -84,9 +83,9 @@ with tf.Session() as sess:
 print('total time', (etime-stime)/60) # 将训练集全部转化为np.array并保存 一共用时1分钟
 '''
 model = inception.Inception()
-
 # 训练集，直接保存transfer_value
 # 由于np.array train data 太大
+# 处理所有文件需要54分钟 
 with tf.Session() as sess:
     train_iterator_handle = sess.run(train_iterator.string_handle())
     val_iterator_handle = sess.run(val_iterator.string_handle())
@@ -105,11 +104,79 @@ with tf.Session() as sess:
              pickle.dump(transfer_values_train, file)
         with open('E:\\transfer_tiny_imagenet\\data2\\train_labels_' + str(i) + '.pkl', 'wb') as file:
              pickle.dump(labels_tmp, file)
-        del train_tmp, labels_tmp,transfer_values_train
-        
+        # del train_tmp, labels_tmp,transfer_values_train
     etime = time.time()
 print('total time', (etime-stime)/60) # 将训练集全部转化为np.array并保存 一共用时1分钟
 
+
+# 将 transfer_values合并为一个文件
+transfer_list = ['train_data_1.pkl',
+ 'train_data_10.pkl',
+ 'train_data_11.pkl',
+ 'train_data_12.pkl',
+ 'train_data_13.pkl',
+ 'train_data_14.pkl',
+ 'train_data_15.pkl',
+ 'train_data_16.pkl',
+ 'train_data_17.pkl',
+ 'train_data_18.pkl',
+ 'train_data_19.pkl',
+ 'train_data_2.pkl',
+ 'train_data_3.pkl',
+ 'train_data_4.pkl',
+ 'train_data_5.pkl',
+ 'train_data_6.pkl',
+ 'train_data_7.pkl',
+ 'train_data_8.pkl',
+ 'train_data_9.pkl']
+
+with open('E:\\transfer_tiny_imagenet\\data2\\train_data_0.pkl', 'rb') as handle:
+     alldata = pickle.load(handle)
+     
+for p in transfer_list:
+    with open('E:\\transfer_tiny_imagenet\\data2\\' + p, 'rb') as handle:
+         data = pickle.load(handle)
+         alldata = np.concatenate((alldata,data),axis = 0)
+         
+with open('train_transfer_all.pickle', 'wb') as handle:
+    pickle.dump(alldata, handle)
+    
+ 
+# 将labels合并为一个文件
+label_list = ['train_labels_1.pkl',
+ 'train_labels_10.pkl',
+ 'train_labels_11.pkl',
+ 'train_labels_12.pkl',
+ 'train_labels_13.pkl',
+ 'train_labels_14.pkl',
+ 'train_labels_15.pkl',
+ 'train_labels_16.pkl',
+ 'train_labels_17.pkl',
+ 'train_labels_18.pkl',
+ 'train_labels_19.pkl',
+ 'train_labels_2.pkl',
+ 'train_labels_3.pkl',
+ 'train_labels_4.pkl',
+ 'train_labels_5.pkl',
+ 'train_labels_6.pkl',
+ 'train_labels_7.pkl',
+ 'train_labels_8.pkl',
+ 'train_labels_9.pkl']
+
+with open('E:\\transfer_tiny_imagenet\\data2\\train_labels_0.pkl', 'rb') as handle:
+     alldata = pickle.load(handle)
+     
+for p in label_list:
+    with open('E:\\transfer_tiny_imagenet\\data2\\' + p, 'rb') as handle:
+         data = pickle.load(handle)
+         alldata = np.concatenate((alldata,data),axis = 0)
+         
+with open('train_labels_all.pickle', 'wb') as handle:
+    pickle.dump(alldata, handle)
+
+    
+
+    
 
 
 

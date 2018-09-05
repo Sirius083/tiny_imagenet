@@ -72,31 +72,6 @@ def plot_images(images, cls_true, cls_pred=None, smooth=True):
     plt.show()
     
 
-'''
-# ================================================================ cifar10
-import cifar10
-from cifar10 import num_classes
-cifar10.maybe_download_and_extract()
-class_names = cifar10.load_class_names()
-class_names
-
-# cls_train:    是 0-9的类别编号
-# labels_train: 是 one-hot类型的类别编号
-images_train, cls_train, labels_train = cifar10.load_training_data()
-images_test, cls_test, labels_test    = cifar10.load_test_data() 
-
-# Get the first images from the test-set.
-images = images_test[0:9]
-
-# Get the true classes for those images.
-cls_true = cls_test[0:9]
-
-# Plot the images and labels using our helper-function above.
-# images: (9,32,32,3)
-# cls_true: (9,)
-plot_images(images=images, cls_true=cls_true, smooth=False)
-'''
-
 #=============================================== tiny imagenet
 # 准备数据
 train_data_path = r'E:\transfer_tiny_imagenet\data_new\train_data_5.pkl'
@@ -118,37 +93,5 @@ cls_true = train_label[idx]
 from input_pipe_aug import build_label_dicts 
 label_dict, class_description = build_label_dicts()
 
-'''
-label_list = ''
-for cls_ in cls_true:
-    label_list = label_list + class_description[cls_] + '_'
-    # print(class_description[cls_])
-    # print(type(class_description[cls_]))
-label_list = label_list.split('_')[:-1]
-'''
-
-
 # plot_images(images=images, cls_true=label_list, smooth=False) 
 plot_images(images=images, cls_true=cls_true, smooth=False) 
-
-'''
-inception.maybe_download()
-model = inception.Inception()
-from inception import transfer_values_cache
-file_path_cache_train = os.path.join(os.getcwd(), 'inception_tiny_train.pkl')
-file_path_cache_test = os.path.join(os.getcwd(), 'inception_tiny_test.pkl')
-
-
-# If transfer-values have already been calculated then reload them,
-# otherwise calculate them and save them to a cache-file.
-images_scaled = images_train * 255.0
-transfer_values_train = transfer_values_cache(cache_path=file_path_cache_train,
-                                              images=images_scaled,
-                                              model=model)
-
-images_scaled = images_test * 255.0
-transfer_values_test = transfer_values_cache(cache_path=file_path_cache_test,
-                                             images=images_scaled,
-                                             model=model)
-
-'''
